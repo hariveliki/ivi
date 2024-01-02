@@ -31,19 +31,43 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 def create_tooltip(id, text):
     return dbc.Tooltip(text, target=id)
 
+
 help_legend = dbc.Row(
     dbc.Col(
         [
             html.H4("Need Help?"),
             html.P("Here are some tips to help you interact with the dashboard:"),
-            html.Ul([
-                html.Li("Move the mouse pointer over the diagrams or filters to see more details. Click through the various options in the diagram and familiarize yourself with the possibilities."),
-                html.Li("For example: Select an area with the mouse to enlarge the diagram. Double-click to zoom back out."),
-                html.Li("If something does not work, try pressing the 'Reload' button in your browser. In most browsers, the button can be found in the top left-hand corner in the form of a circled arrow."),
-            ]),
+            html.Ul(
+                [
+                    html.Li(
+                        "Move the mouse pointer over the diagrams or filters to see more details. Click through the various options in the diagram and familiarize yourself with the possibilities."
+                    ),
+                    html.Li(
+                        "For example: Select an area with the mouse to enlarge the diagram. Double-click to zoom back out."
+                    ),
+                    html.Li(
+                        "If something does not work, try pressing the 'Reload' button in your browser. In most browsers, the button can be found in the top left-hand corner in the form of a circled arrow."
+                    ),
+                ]
+            ),
             html.P("For more assistance, contact the dashboard administrator."),
         ],
-        className="mb-4"
+        className="mb-4",
+    )
+)
+
+reference_block = dbc.Row(
+    dbc.Col(
+        [
+            html.H4("References"),
+            html.P("Links to datasources and miscellaneous"),
+            html.Ul(
+                [
+                    html.Li(html.A("Datasource", href="https://www.kaggle.com/datasets/simonlozada/coronavirus-in-argentina/")),
+                ]
+            ),
+        ],
+        className="mb-4",
     )
 )
 
@@ -148,6 +172,7 @@ app.layout = dbc.Container(
             ]
         ),
         help_legend,
+        reference_block,
     ],
     fluid=True,
 )
@@ -159,7 +184,6 @@ app.layout = dbc.Container(
     [Input("gender-dropdown", "value"), Input("age-range-slider", "value")],
 )
 def update_graphs(selected_genders, age_range):
-
     # Filter data based on gender and age range
     filtered_df = covid_filtered[
         (covid_filtered["gender"].isin(selected_genders))
@@ -168,11 +192,7 @@ def update_graphs(selected_genders, age_range):
     ]
 
     # Update region-cases graph
-    region_cases_df = (
-        filtered_df.groupby("province")
-        .size()
-        .reset_index(name="cases")
-    )
+    region_cases_df = filtered_df.groupby("province").size().reset_index(name="cases")
     region_cases_df = region_cases_df.sort_values(
         "cases", ascending=False
     )  # Sort in descending order
